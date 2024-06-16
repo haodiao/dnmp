@@ -115,12 +115,13 @@ services:
     image: mcuadros/ofelia:${OFELIA_VERSION}
     container_name: ofelia
     depends_on:
+      - php
       - mariadb
     command: daemon --config=/etc/ofelia/config.ini
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${OFELIA_CONF_DIR}:/etc/ofelia
-      - ofeliaLogs:/var/log/ofelia
+      - ${OFELIA_CONF_DIR}:/etc/ofelia:rw
+      - ofeliaLogs:/var/log/ofelia:ro
     restart: always
     environment:
       TZ: "$TZ"
