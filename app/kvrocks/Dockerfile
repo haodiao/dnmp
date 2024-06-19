@@ -1,32 +1,36 @@
 ARG KVROCKS_VERSION
 ARG TZ
 
-FROM alpine:3.16 as build
+FROM debian:bookworm-slim AS build
 
 ARG MORE_BUILD_ARGS
 ARG CONTAINER_PACKAGE_URL
 
-RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ] ; then sed -i "s/dl-cdn.alpinelinux.org/${CONTAINER_PACKAGE_URL}/g" /etc/apk/repositories ; fi
+RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ] ; then sed -i "s/deb.debian.org/${CONTAINER_PACKAGE_URL}/g" /etc/apt/sources.list ; fi
+RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ] ; then sed -i "s/security.debian.org/${CONTAINER_PACKAGE_URL}/g" /etc/apt/sources.list ; fi
 
-RUN apk update && apk upgrade && apk add git gcc g++ make cmake ninja autoconf automake libtool python3 linux-headers curl openssl-dev libexecinfo-dev redis
+RUN DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get upgrade -y && apt-get -y --no-install-recommends install ca-certificates git build-essential autoconf cmake libtool python3 libssl-dev
 
 WORKDIR /kvrocks
 
 RUN git clone --depth 1 https://github.com/apache/kvrocks.git /kvrocks
 RUN ./x.py build -DENABLE_OPENSSL=ON -DPORTABLE=1 -DCMAKE_BUILD_TYPE=Release -j $(nproc) $MORE_BUILD_ARGS
 
-FROM alpine:3.16
+FROM debian:bookworm-slim
 
-RUN apk update && apk upgrade && apk add libexecinfo
+RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ] ; then sed -i "s/deb.debian.org/${CONTAINER_PACKAGE_URL}/g" /etc/apt/sources.list ; fi
+RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ] ; then sed -i "s/security.debian.org/${CONTAINER_PACKAGE_URL}/g" /etc/apt/sources.list ; fi
+
+RUN DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get upgrade -y && apt-get -y install openssl ca-certificates redis-tools
+
 RUN mkdir /var/run/kvrocks
 
 VOLUME /var/lib/kvrocks
 
 COPY --from=build /kvrocks/build/kvrocks /bin/
-COPY --from=build /usr/bin/redis-cli /bin/
 
 HEALTHCHECK --interval=10s --timeout=1s --start-period=30s --retries=3 \
-    CMD ./bin/redis-cli -p 6666 PING | grep -E '(PONG|NOAUTH)' || exit 1
+    CMD redis-cli -p 6666 PING | grep -E '(PONG|NOAUTH)' || exit 1
 
 #COPY ./LICENSE ./NOTICE ./licenses /kvrocks/
 #COPY ./kvrocks.conf /var/lib/kvrocks/

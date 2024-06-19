@@ -29,7 +29,7 @@ services:
       context: ./app/nginx
       dockerfile: Dockerfile
       args:
-        NGINX_VERSION: nginx:${NGINX_VERSION}
+        NGINX_VERSION: nginx:${NGINX_VERSION}-alpine
         CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
     container_name: nginx
     ports:
@@ -96,7 +96,12 @@ services:
 
 
   kvrocks:
-    image: apache/kvrocks:${KVROCKS_VERSION}
+    build:
+      context: ./app/kvrocks
+      dockerfile: Dockerfile
+      args:
+        KVROCKS_VERSION: apache/kvrocks:${KVROCKS_VERSION}
+        CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
     container_name: kvrocks
     ports:
       - "${KVROCKS_HOST_PORT}:6666"
@@ -108,7 +113,6 @@ services:
       TZ: "$TZ"
     networks:
       - default
-
 
 
   ofelia:
