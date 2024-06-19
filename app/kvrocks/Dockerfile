@@ -6,8 +6,7 @@ FROM debian:bookworm-slim AS build
 ARG MORE_BUILD_ARGS
 ARG CONTAINER_PACKAGE_URL
 
-RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ] ; then sed -i "s/deb.debian.org/${CONTAINER_PACKAGE_URL}/g" /etc/apt/sources.list ; fi
-RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ] ; then sed -i "s/security.debian.org/${CONTAINER_PACKAGE_URL}/g" /etc/apt/sources.list ; fi
+RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ] ; then sed -i "s/deb.debian.org/${CONTAINER_PACKAGE_URL}/g" /etc/apt/sources.list.d/debian.sources ; fi
 
 RUN DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get upgrade -y && apt-get -y --no-install-recommends install ca-certificates git build-essential autoconf cmake libtool python3 libssl-dev
 
@@ -18,8 +17,9 @@ RUN ./x.py build -DENABLE_OPENSSL=ON -DPORTABLE=1 -DCMAKE_BUILD_TYPE=Release -j 
 
 FROM debian:bookworm-slim
 
-RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ] ; then sed -i "s/deb.debian.org/${CONTAINER_PACKAGE_URL}/g" /etc/apt/sources.list ; fi
-RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ] ; then sed -i "s/security.debian.org/${CONTAINER_PACKAGE_URL}/g" /etc/apt/sources.list ; fi
+ARG CONTAINER_PACKAGE_URL
+
+RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ] ; then sed -i "s/deb.debian.org/${CONTAINER_PACKAGE_URL}/g" /etc/apt/sources.list.d/debian.sources ; fi
 
 RUN DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get upgrade -y && apt-get -y install openssl ca-certificates redis-tools
 
