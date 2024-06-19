@@ -124,8 +124,8 @@ services:
     command: daemon --config=/etc/ofelia/config.ini
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${OFELIA_CONF_DIR}:/etc/ofelia:rw
-      - ofeliaLogs:/var/log/ofelia:ro
+      - ${OFELIA_CONF_DIR}:/etc/ofelia:ro
+      - ofeliaLogs:/var/log/ofelia:rw
     restart: always
     environment:
       TZ: "$TZ"
