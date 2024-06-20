@@ -38,7 +38,7 @@ services:
       - "${NGINX_HTTPS_HOST_PORT}:443/udp"
     volumes:
       - ${SOURCE_DIR}:/www/:rw
-      - ${NGINX_SSL_CERTIFICATE_DIR}:/etc/nginx/ssl/:ro
+      - ${NGINX_SSL_CERTIFICATE_DIR}:/etc/nginx/ssl/:rw
       - ${NGINX_CONF_DIR}:/etc/nginx/conf/:rw
       - ${NGINX_VHOST_CONF_DIR}:/etc/nginx/vhost/:ro
       - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf:ro
