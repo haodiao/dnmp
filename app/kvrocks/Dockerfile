@@ -7,6 +7,7 @@ ARG MORE_BUILD_ARGS
 ARG CONTAINER_PACKAGE_URL
 
 RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ] ; then sed -i "s/deb.debian.org/${CONTAINER_PACKAGE_URL}/g" /etc/apt/sources.list.d/debian.sources ; fi
+RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ] ; then sed -i "s/security.debian.org/${CONTAINER_PACKAGE_URL}/g" /etc/apt/sources.list.d/debian.sources ; fi
 
 RUN DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get upgrade -y && apt-get -y --no-install-recommends install ca-certificates git build-essential autoconf cmake libtool python3 libssl-dev
 
@@ -20,6 +21,7 @@ FROM debian:bookworm-slim
 ARG CONTAINER_PACKAGE_URL
 
 RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ] ; then sed -i "s/deb.debian.org/${CONTAINER_PACKAGE_URL}/g" /etc/apt/sources.list.d/debian.sources ; fi
+RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ] ; then sed -i "s/security.debian.org/${CONTAINER_PACKAGE_URL}/g" /etc/apt/sources.list.d/debian.sources ; fi
 
 RUN DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get upgrade -y && apt-get -y install openssl ca-certificates redis-tools
 

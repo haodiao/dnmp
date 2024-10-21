@@ -30,15 +30,15 @@ installPHPExtensions() {
 			continue
 		fi
 
-		# imagick 还没有支持 PHP8.3 的正式版，暂时安装开发版
-		if [ "imagick" = ${extName} ]; then
-			if [ $(php -r 'echo PHP_VERSION_ID;') -ge 80300 ]; then
-			# PHP8.3 不适用于 alpine3.19 ，暂时注释
-			# ext="https://api.github.com/repos/Imagick/imagick/tarball/28f27044e435a2b203e32675e942eb8de620ee58";
-			# PHP8.3 暂时改为3.6版本
-			ext=imagick-3.6.0
-			fi
-		fi
+		## imagick 还没有支持 PHP8.3 的正式版，暂时安装开发版
+		#if [ "imagick" = ${extName} ]; then
+		#	if [ $(php -r 'echo PHP_VERSION_ID;') -ge 80300 ]; then
+		#	# PHP8.3 不适用于 alpine3.19 ，暂时注释
+		#	# ext="https://api.github.com/repos/Imagick/imagick/tarball/28f27044e435a2b203e32675e942eb8de620ee58";
+		#	# PHP8.3 暂时改为3.6版本
+		#	ext=imagick-3.6.0
+		#	fi
+		#fi
 
         installExts="$installExts $ext"
     done
