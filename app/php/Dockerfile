@@ -10,7 +10,7 @@ RUN if [ $CONTAINER_PACKAGE_URL ] ; then sed -i "s/dl-cdn.alpinelinux.org/${CONT
 COPY ./extensions /tmp/extensions
 
 #ADD ./extensions/install-php-extensions  /usr/local/bin/
-RUN curl -k -o /usr/local/bin/install-php-extensions https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions && chmod uga+x /usr/local/bin/install-php-extensions
+RUN curl -L -o /usr/local/bin/install-php-extensions https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions && chmod uga+x /usr/local/bin/install-php-extensions
 
 RUN apk --no-cache add tzdata \
     && cp "/usr/share/zoneinfo/$TZ" /etc/localtime \
@@ -26,10 +26,10 @@ RUN chmod +x install.sh \
     && rm -rf /tmp/extensions
 
 # Install cacert.pem
-RUN curl -k -o /usr/local/etc/php/cacert.pem https://curl.se/ca/cacert.pem
+RUN curl -L -o /usr/local/etc/php/cacert.pem https://curl.se/ca/cacert.pem
 
 # Install composer and change it's cache home
-RUN curl -k -o /usr/bin/composer https://getcomposer.org/download/latest-stable/composer.phar \
+RUN curl -L -o /usr/bin/composer https://getcomposer.org/download/latest-stable/composer.phar \
     && chmod +x /usr/bin/composer
 ENV COMPOSER_HOME=/tmp/composer
 
