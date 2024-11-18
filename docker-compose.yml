@@ -20,6 +20,8 @@ volumes:
     driver: local
   ofeliaLogs:
     driver: local
+  dpanelData:
+    driver: local
 
 
 services:
@@ -45,12 +47,15 @@ services:
       - nginxLogs:/var/log/nginx:rw
     environment:
       TZ: "$TZ"
-      #- TZ=Asia/Shanghai
     restart: always
     networks:
       - default
     depends_on:
       - php
+    #映射docker.internal域名到宿主机IP，用于nginx反代时配置域名即可反代宿主机端口，例如：proxy_pass http://docker.internal:1234
+    #如果是docker compose同网络内(这里为default)的反代域名，就直接填写 container_name 名称就行，例如：proxy_pass http://dpanel:8080
+    extra_hosts:
+      - docker.internal:host-gateway
 
 
   php:
@@ -75,13 +80,16 @@ services:
       - SYS_PTRACE
     networks:
       - default
+    #映射docker.internal域名到宿主机IP，用于PHP访问宿主机上的其他端口的服务
+    extra_hosts:
+      - docker.internal:host-gateway
 
 
   mariadb:
     image: mariadb:${MARIADB_VERSION}
     container_name: mariadb
     ports:
-      - "${MARIADB_HOST_PORT}:3306"
+      - "${MARIADB_HOST_PORT}:3306" #正式环境中没外部访问需求，或非必要不建议对开放端口
     volumes:
       - ${MARIADB_CONF_FILE}:/etc/mysql/conf.d/my.cnf:ro
       - mariadbData:/var/lib/mysql:rw
@@ -104,7 +112,7 @@ services:
         CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
     container_name: kvrocks
     ports:
-      - "${KVROCKS_HOST_PORT}:6666"
+      - "${KVROCKS_HOST_PORT}:6666" #正式环境中没外部访问需求，或非必要不建议对开放端口
     volumes:
       - kvrocksData:/var/lib/kvrocks:rw
       - ${KVROCKS_CONF_FILE}:/kvrocks/kvrocks.conf:ro
@@ -129,3 +137,26 @@ services:
     restart: always
     environment:
       TZ: "$TZ"
+
+
+  dpanel:
+    image: dpanel/dpanel:lite
+    container_name: dpanel #更改此名称后，请同步修改下方 APP_NAME 环境变量
+    #ports:
+    #  - "${DPANEL_HOST_PORT}:8080" #正式环境中不建议对外部开放端口，推荐 nginx 反代内部 dpanel 的 8080 端口
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - dpanelData:/dpanel
+    restart: always
+    environment:
+      APP_NAME: dpanel #请保持此名称与 container_name 一致
+      TZ: "$TZ"
+
+
+  dpanel-plugin-explorer:  #该镜像为 dpanel 的文件浏览器,隔离特权
+    image: alpine:latest    
+    container_name: dpanel-plugin-explorer
+    restart: always
+    privileged: true
+    pid: host
+    command: ["sh", "-c", "tail -f /dev/null"]
