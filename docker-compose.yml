@@ -28,7 +28,7 @@ services:
 
   nginx:
     build:
-      context: ./app/nginx
+      context: ${APP_DIR}/nginx
       dockerfile: Dockerfile
       args:
         NGINX_VERSION: nginx:${NGINX_VERSION}-alpine
@@ -60,7 +60,7 @@ services:
 
   php:
     build:
-      context: ./app/php
+      context: ${APP_DIR}/php
       dockerfile: Dockerfile
       args:
         PHP_VERSION: php:${PHP_VERSION}-fpm-alpine
@@ -105,7 +105,7 @@ services:
 
   kvrocks:
     build:
-      context: ./app/kvrocks
+      context: ${APP_DIR}/kvrocks
       dockerfile: Dockerfile
       args:
         KVROCKS_VERSION: apache/kvrocks:${KVROCKS_VERSION}
@@ -117,10 +117,10 @@ services:
       - kvrocksData:/var/lib/kvrocks:rw
       - ${KVROCKS_CONF_FILE}:/kvrocks/kvrocks.conf:ro
     restart: always
-    environment:
-      TZ: "$TZ"
     networks:
       - default
+    environment:
+      TZ: "$TZ"
 
 
   ofelia:
