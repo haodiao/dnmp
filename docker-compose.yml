@@ -152,11 +152,3 @@ services:
       APP_NAME: dpanel #请保持此名称与 container_name 一致
       TZ: "$TZ"
 
-
-  dpanel-plugin-explorer:  #该镜像为 dpanel 的文件浏览器,隔离特权
-    image: alpine:latest    
-    container_name: dpanel-plugin-explorer
-    restart: always
-    privileged: true
-    pid: host
-    command: ["sh", "-c", "tail -f /dev/null"]
