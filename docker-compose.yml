@@ -8,19 +8,19 @@ networks:
 
 #创建自定义名称的卷
 volumes:
-  nginxLogs:
+  nginx_logs:
     driver: local
-  phpLogs:
+  php_logs:
     driver: local
-  mariadbData:
+  mariadb_data:
    driver: local
-  mariadbLogs:
+  mariadb_logs:
    driver: local
-  kvrocksData:
+  kvrocks_data:
     driver: local
-  ofeliaLogs:
+  ofelia_logs:
     driver: local
-  dpanelData:
+  dpanel_data:
     driver: local
 
 
@@ -44,7 +44,7 @@ services:
       - ${NGINX_CONF_DIR}:/etc/nginx/conf/:rw
       - ${NGINX_VHOST_CONF_DIR}:/etc/nginx/vhost/:ro
       - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf:ro
-      - nginxLogs:/var/log/nginx:rw
+      - nginx_logs:/var/log/nginx:rw
     environment:
       TZ: "$TZ"
     restart: always
@@ -74,7 +74,7 @@ services:
       - ${PHP_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
       - ${PHP_FPM_CONF_FILE}:/usr/local/etc/php-fpm.conf:rw
       - ${PHP_FPM_WWW_CONF_FILE}:/usr/local/etc/php-fpm.d/www.conf:rw
-      - phpLogs:/var/log/php:rw
+      - php_logs:/var/log/php:rw
     restart: always
     cap_add:
       - SYS_PTRACE
@@ -95,8 +95,8 @@ services:
       - "${MARIADB_HOST_PORT}:3306" #正式环境中没外部访问需求，或非必要不建议对开放端口
     volumes:
       - ${MARIADB_CONF_FILE}:/etc/mysql/conf.d/my.cnf:ro
-      - mariadbData:/var/lib/mysql:rw
-      - mariadbLogs:/var/log/mysql:rw
+      - mariadb_data:/var/lib/mysql:rw
+      - mariadb_logs:/var/log/mysql:rw
     restart: always
     networks:
       - default
@@ -117,7 +117,7 @@ services:
     ports:
       - "${KVROCKS_HOST_PORT}:6666" #正式环境中没外部访问需求，或非必要不建议对开放端口
     volumes:
-      - kvrocksData:/var/lib/kvrocks:rw
+      - kvrocks_data:/var/lib/kvrocks:rw
       - ${KVROCKS_CONF_FILE}:/kvrocks/kvrocks.conf:ro
     restart: always
     networks:
@@ -131,9 +131,9 @@ services:
     container_name: ofelia
     command: daemon --config=/etc/ofelia/config.ini
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock
       - ${OFELIA_CONF_DIR}:/etc/ofelia:ro
-      - ofeliaLogs:/var/log/ofelia:rw
+      - ofelia_logs:/var/log/ofelia:rw
     restart: always
     environment:
       TZ: "$TZ"
@@ -146,7 +146,7 @@ services:
     #  - "${DPANEL_HOST_PORT}:8080" #正式环境中不建议对外部开放端口，推荐 nginx 反代内部 dpanel 的 8080 端口
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - dpanelData:/dpanel
+      - dpanel_data:/dpanel:rw
     restart: always
     environment:
       APP_NAME: dpanel #请保持此名称与 container_name 一致
