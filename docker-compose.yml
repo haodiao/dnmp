@@ -52,6 +52,7 @@ services:
       - default
     depends_on:
       - php
+      - dpanel
     #映射docker.internal域名到宿主机IP，用于nginx反代时配置域名即可反代宿主机端口，例如：proxy_pass http://docker.internal:1234
     #如果是docker compose同网络内(这里为default)的反代域名，就直接填写 container_name 名称就行，例如：proxy_pass http://dpanel:8080
     extra_hosts:
@@ -148,6 +149,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - dpanel_data:/dpanel:rw
     restart: always
+    networks:
+      - default
     environment:
       APP_NAME: dpanel #请保持此名称与 container_name 一致
       TZ: "$TZ"
