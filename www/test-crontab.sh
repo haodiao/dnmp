@@ -25,7 +25,7 @@ fi
 
 # 判断 prober.php 文件是否存在
 if [ ! -f /www/default/prober.php ];then
-    curl -k -o /www/default/prober.php https://github.com/kmvan/x-prober/raw/master/dist/prober.php
+    curl -kL -o /www/default/prober.php https://github.com/kmvan/x-prober/raw/master/dist/prober.php
 fi
 
 echo "OK"
